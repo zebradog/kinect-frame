@@ -34,9 +34,8 @@
 
 		<script src="./js/Detector.js"></script>
 		<script src="./js/stats.min.js"></script>
-
 		<script src="./js/three.min.js"></script>
-
+        <script src="./js/zig.min.js"></script>
 		<script src="./js/helvetiker_bold.typeface.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -112,7 +111,7 @@
             document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
-			camera.position.z = 350;
+			camera.position.z = 400;
             camera.position.y = -20;
 
 			scene = new THREE.Scene();
@@ -205,6 +204,23 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 		}
+        
+        var currentX, currentY, currentZ = 0.5;
+        zig.addEventListener('userfound', function(user) {
+            console.log('Found user. ID: ' + user.id);
+            user.addEventListener('userupdate', function(user) {
+                var x = (user.position[0] / 1000) + 0.5; // 0 for x is actually the center of the depthmap
+                var y = (user.position[1] / 1000) + 0.5;
+                var z = (user.position[2] / 1000);
+                currentX = x;
+                currentY = y;
+                currentZ = z;
+            });
+        });
+
+        zig.addEventListener('userlost', function(user) {
+            console.log('Lost user. ID: ' + user.id);
+        });
 
 		function onWindowResize() {
 
@@ -215,12 +231,11 @@
 
 		}
         
-        var currentX, currentY;
+
         function onDocumentMouseMove( e ) {
             currentX =  e.clientX / window.innerWidth;
-            currentY =  e.clientY / window.innerHeight;
-            console.log(currentX+" , "+currentY)
-        } 
+            currentZ =  e.clientY / window.innerHeight;
+        }
 
 		function animate() {
 
@@ -239,7 +254,7 @@
             var ROTATION_AMOUNT = 1.5;
             object.rotation.y = (currentX - 0.5) * ROTATION_AMOUNT + 0.125 * Math.sin( 0.5 * time);
 
-			uniforms.amplitude.value = 0.25 * Math.max(currentY - 0.25,0);//0.5 * Math.sin( 0.5 * currentY );
+			uniforms.amplitude.value = 0.25 * Math.max(currentZ - 0.85,0);
 			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
 			var nx, ny, nz, value;
