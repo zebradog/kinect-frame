@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- saved from url=(0062)http://threejs.org/examples/webgl_custom_attributes_lines.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>three.js webgl - custom attributes [lines]</title>
+		<title>ZEBRADOG - Kinect Frame</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -109,6 +109,8 @@
 
 		function init() {
 
+            document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
 			camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 350;
             camera.position.y = -20;
@@ -125,7 +127,7 @@
 			uniforms = {
 
 				amplitude: { type: "f", value: 5.0 },
-				opacity:   { type: "f", value: 0.3 },
+				opacity:   { type: "f", value: 0.4 },
 				color:     { type: "c", value: new THREE.Color( 0xff0000 ) }
 
 			};
@@ -212,6 +214,13 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
+        
+        var currentX, currentY;
+        function onDocumentMouseMove( e ) {
+            currentX =  e.clientX / window.innerWidth;
+            currentY =  e.clientY / window.innerHeight;
+            console.log(currentX+" , "+currentY)
+        } 
 
 		function animate() {
 
@@ -226,18 +235,20 @@
 
 			var time = Date.now() * 0.001;
 
-			object.rotation.y = 0.25 * time;
+			object.rotation.x = 0.25 * Math.sin( 0.5 * time) ;
+            var ROTATION_AMOUNT = 1.5;
+            object.rotation.y = (currentX - 0.5) * ROTATION_AMOUNT + 0.125 * Math.sin( 0.5 * time);
 
-			uniforms.amplitude.value = 0.5 * Math.sin( 0.5 * time );
+			uniforms.amplitude.value = 0.25 * Math.max(currentY - 0.25,0);//0.5 * Math.sin( 0.5 * currentY );
 			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
 			var nx, ny, nz, value;
 
 			for( var i = 0, il = attributes.displacement.value.length; i < il; i ++ ) {
 
-				nx = 0.3 * ( 0.5 - Math.random() );
-				ny = 0.3 * ( 0.5 - Math.random() );
-				nz = 0.3 * ( 0.5 - Math.random() );
+				nx = 5.0 * ( 0.5 - Math.random() );
+				ny = 5.0 * ( 0.5 - Math.random() );
+				nz = 5.0 * ( 0.5 - Math.random() );
 
 				value = attributes.displacement.value[ i ];
 
